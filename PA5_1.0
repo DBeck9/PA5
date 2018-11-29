@@ -46,6 +46,18 @@ then
    exit
 fi
 
-echo "Name|Departure|Destination|Depature Date|Arrival Date|Bags"
-echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]} " >> Reservations.txt
 
+touch Reservations.txt
+grep "^${var[name]}|" Reservations.txt
+if [[ $? -ne 0 ]] #If the user's name isn't in the file yet
+then
+	echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]}" >> Reservations.txt #Append flight information to the file
+else #If user's name is already in file
+	touch reservationsCopy.txt
+	`zenity --info --width=400 --title="Legit Reservation Program" --text="You've already scheduled a flight, rescheduling old flight with new information..."`
+	grep -v "^${var[name]}|" Reservations.txt > reservationsCopy.txt #Add the existing travel information (minus the users old info) to a buffer file, then copy that information back to the main file
+	cat reservationsCopy.txt > Reservations.txt
+	echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]}" >> Reservations.txt #Append new info to the file
+fi
+
+`zenity --info --width=300 --title="Legit Reservation Program" --text="Name: ${var[name]}\nDeparture: ${var[departure]}\nDestination: ${var[destination]}\nDeparture Date: ${var[departuredate]}\nArrival Date: ${var[arrivaldate]}\nBags: ${var[bags]}"`
