@@ -1,44 +1,51 @@
 #!/bin/bash
- ##########################################################
-#					Programming Assignment 5			 #
-#					  November 30th, 2018				 #
-#	Damon Willingham, Trevor Holland, Bradley Decker,	 #
-#		Josh											 #
-#					Programming Assignment 5			 		             #
-#					  November 30th, 2018				                   #
-#	Damon Willingham, Trevor Holland, Bradley Decker,	     #
-#		Josh Giurculete											                 #
+
 ##########################################################
- declare -A var   #declaring array var to use array of strings
- var[name]=`zenity --entry --width=300 --title="Legit Reservation Program" --text="Enter Your Name"`		#Setting name into array
+#					Programming Assignment 5			 		   #
+#					  November 30th, 2018				         #
+#	Damon Willingham, Trevor Holland, Bradley Decker,	   #
+#		Josh Giurculete											   #
+##########################################################
+
+declare -A var   #declaring array var to use array of strings
+
+var[name]=`zenity --entry --width=300 --title="Legit Reservation Program" --text="Enter Your Name"`		#Setting name into array
 if [[ $? -eq 1 ]]			#Checking if entry was cancelled
 then
    exit
 fi
- var[departure]=`zenity --list --title="Legit Reservation Program" --text="Enter Your Departure Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston"`
+
+var[departure]=`zenity --list --title="Legit Reservation Program" --text="Enter Your Departure Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston"`
 if [[ $? -eq 1 ]]
 then
    exit
 fi
- var[destination]=`zenity --list --title="Legit Reservation Program" --text="Enter Your Destination Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston"`
+
+
+var[destination]=`zenity --list --title="Legit Reservation Program" --text="Enter Your Destination Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston"`
 if [[ $? -eq 1 ]]
 then
    exit
 fi
- var[departuredate]=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Departure Date"`
+
+var[departuredate]=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Departure Date"`
 if [[ $? -eq 1 ]]
 then
    exit
 fi
- var[arrivaldate]=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Return Date"`
+
+var[arrivaldate]=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Return Date"`
 if [[ $? -eq 1 ]]
 then
    exit
 fi
- var[bags]=`zenity --list --title="Legit Reservation Program" --text="How many bags are you using?" --column "1" "2" "3" "4" "other"`
+
+var[bags]=`zenity --list --title="Legit Reservation Program" --text="How many bags are you bringing?" --column "Bags" "0" "1" "2" "3" "4"` 
 if [[ $? -eq 1 ]]
 then
    exit
 fi
- echo "Name|Departure|Destination|Depature Date|Arrival Date|Bags"   #Displaying the layout of the next echo
-echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]} "
+
+echo "Name|Departure|Destination|Depature Date|Arrival Date|Bags"
+echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]} " >> Reservations.txt
+
