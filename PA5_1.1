@@ -1,0 +1,52 @@
+#!/bin/bash
+##########################################################
+#		 Programming Assignment 5	         #
+#	 	   November 30th, 2018		         #
+#   Damon Willingham, Trevor Holland, Bradley Decker,	 #
+#   		     Josh Giurculete			 #
+##########################################################
+
+	declare -A var   #declaring array var to use array of strings
+	var[name]=`/bin/zenity/bin/zenity --entry --width=300 --title="Legit Reservation Program" --text="Enter Your Name" 2> /dev/null | sed 's/\r//'`		#Setting name into array
+if [[ $? -eq 1 ]]			#Checking if entry was cancelled
+then
+	exit
+fi
+	var[departure]=`/bin/zenity/bin/zenity --list --title="Legit Reservation Program" --text="Enter Your Departure Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston" "Los Angeles" 2> /dev/null | sed 's/\r//'`
+if [[ $? -eq 1 ]]
+then
+	exit
+fi
+	var[destination]=`/bin/zenity/bin/zenity --list --title="Legit Reservation Program" --text="Enter Your Destination Location" --column="Cities" "New York City" "San Francisco" "Seattle" "Chicago" "Austin" "Boston" "Los Angeles" 2> /dev/null | sed 's/\r//'`
+if [[ $? -eq 1 ]]
+then
+	exit
+fi
+	var[departuredate]=`/bin/zenity/bin/zenity --calendar --title="Legit Reservation Program" --text="Enter Your Departure Date" 2> /dev/null | sed 's/\r//'`
+if [[ $? -eq 1 ]]
+then
+	exit
+fi
+	var[arrivaldate]=`/bin/zenity/bin/zenity --calendar --title="Legit Reservation Program" --text="Enter Your Return Date" 2> /dev/null | sed 's/\r//'`
+if [[ $? -eq 1 ]]
+then
+	exit
+fi
+	var[bags]=`/bin/zenity/bin/zenity --list --title="Legit Reservation Program" --text="How many bags are you using?" --column "1" "2" "3" "4" "other" 2> /dev/null | sed 's/\r//'`
+if [[ $? -eq 1 ]]
+then
+	exit
+fi
+
+touch reservations.txt
+grep "^${var[name]}|" reservations.txt
+if [[ $? -ne 0 ]] #If the user's name isn't in the file yet
+then
+	echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]}" >> reservations.txt #Append flight information to the file
+else #If user's name is already in file
+	touch reservationsCopy.txt
+	echo "You've already scheduled a flight, scheduling another with new information..."
+	grep -v "^${var[name]}|" reservations.txt > reservationsCopy.txt #Add the existing travel information (minus the users old info) to a buffer file, then copy that information back to the main file
+	cat reservationsCopy.txt > reservations.txt
+	echo "${var[name]}|${var[departure]}|${var[destination]}|${var[departuredate]}|${var[arrivaldate]}|${var[bags]}" >> reservations.txt #Append new info to the file
+fi
