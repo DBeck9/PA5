@@ -1,0 +1,92 @@
+#!/bin/bash
+##########################################################
+#		 Programming Assignment 5	         #
+#	 	   November 30th, 2018		         #
+#   Damon Willingham, Trevor Holland, Bradley Decker,	 #
+#   		     Josh Giurculete			 #
+##########################################################
+
+name=`zenity --entry --width=300 --title="Legit Reservation Program" --text="Enter Your Name"`
+if [[ $? -ne 0 ]]			#Checking if entry was cancelled
+then
+	exit
+fi
+name=`echo "$name" | sed 's/\r//'`   #removing carriage return to stop windows weirdness
+
+departure=`zenity --list --title="Legit Reservation Program" --text="Enter Your Departure Location" --column="Cities" "New_York_City" "San_Francisco" "Seattle" "Chicago" "Austin" "Boston" "Los_Angeles"`
+if [[ $? -ne 0 ]]
+then
+	exit
+fi
+departure=`echo "$departure" | sed 's/\r//'`
+
+destinationCmd='New_York_City San_Francisco Seattle Chicago Austin Boston Los_Angeles'   #Assigning the destination cities to a variable
+destinationCmd=`echo "$destinationCmd" | sed "s/$departure *//"`   #Modifying the variable to remove the departure city
+destination=`zenity --list --title="Legit Reservation Program" --text="Enter Your Destination Location" --column="Cities" $destinationCmd`   #Running command to find destination without including the departure city (not sure why this works)
+if [[ $? -ne 0 ]]
+then
+	exit
+fi
+destination=`echo "$destination" | sed 's/\r//'`
+
+departuredate=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Departure Date"`
+if [[ $? -ne 0 ]]
+then
+	exit
+fi
+departuredate=`echo "$departuredate" | sed 's/\r//'`
+
+departureMonth=`echo "$departuredate" | sed 's/\(..\).*/\1/'`   #Reading day, month, and year as separate variables
+departureDay=`echo "$departuredate" | sed 's/..\/\(..\).*/\1/'`
+departureYear=`echo "$departuredate" | sed 's/..\/..\/\(..\)/\1/'`
+
+arrivaldate=`zenity --calendar --title="Legit Reservation Program" --text="Enter Your Return Date"`
+if [[ $? -ne 0 ]]
+then
+	exit
+fi
+arrivaldate=`echo "$arrivaldate" | sed 's/\r//'`
+
+arrivalMonth=`echo "$arrivaldate" | sed 's/^\(..\).*/\1/'`   #Reading day, month, and year again
+arrivalDay=`echo "$arrivaldate" | sed 's/..\/\(..\).*/\1/'`
+arrivalYear=`echo "$arrivaldate" | sed 's/..\/..\/\(..\)/\1/'`
+
+#Checking if the arrival date is before the departure date until it isn't
+while [[ $arrivalYear -lt $departureYear ]] || [[ $arrivalMonth -lt $departureMonth ]] && [[ $arrivalYear -le $departureYear ]] || [[ arrivalDay -lt departureDay ]] && [[ arrivalMonth -le departureMonth ]] && [[ arrivalYear -le departureYear ]]
+do
+	arrivaldate=`zenity --calendar --title="Legit Reservation Program" --text="Invalid return date (unless you are a time traveler???). Please re-enter"`
+	if [[ $? -ne 0 ]]
+	then
+		exit
+	fi
+	arrivaldate=`echo "$arrivaldate" | sed 's/\r//'`
+
+	arrivalMonth=`echo "$arrivaldate" | sed 's/^\(..\).*/\1/'`   #Rereading
+	arrivalDay=`echo "$arrivaldate" | sed 's/..\/\(..\).*/\1/'`
+	arrivalYear=`echo "$arrivaldate" | sed 's/..\/..\/\(..\)/\1/'`
+done
+
+bags=`zenity --list --title="Legit Reservation Program" --text="How many bags are you using?" --column="Bag Count" "1" "2" "3" "4" "Infinite Bags"`
+if [[ $? -ne 0 ]]
+then
+	exit
+fi
+bags=`echo "$bags" | sed 's/\r//'`
+
+touch reservations.txt   #creating reservations.txt if it doesn't already exist
+grep -q "^$name|" reservations.txt   #reading the file to check if the user's name is in it
+if [[ $? -ne 0 ]] #If the user's name isn't in the file yet
+then
+	echo "$name|$departure|$destination|$departuredate|$arrivaldate|$bags" >> reservations.txt   #Append flight information to the file
+else   #If user's name is already in file
+	check=`zenity --list --title "Legit Reservation Program" --text="You've already scheduled a flight, would you like to reschedule with new information?" --column="Yes or no" "Yes" "No (keeps old info)"`
+	check=`echo "$check" | sed 's/\r//'`   #Checking if the user wants to update their info and updating it if they do
+	if [[ "$check" == "Yes" ]]
+	then
+		touch reservationsCopy.txt   #creating file copy if it doesn't already exist
+		echo "rescheduling..."
+		grep -v "^$name|" reservations.txt > reservationsCopy.txt   #Add the existing travel information (minus the users old info) to a buffer file, then copy that information back to the main file
+		cat reservationsCopy.txt > reservations.txt
+		echo "$name|$departure|$destination|$departuredate|$arrivaldate|$bags" >> reservations.txt   #Append new info to the file
+	fi
+fi
