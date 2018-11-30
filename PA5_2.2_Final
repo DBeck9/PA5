@@ -84,6 +84,7 @@ grep -q "^$name|" reservations.txt
 if [[ $? -ne 0 ]] #If the user's name isn't in the file yet
 then
 	echo "$name|$departure|$destination|$departuredate|$arrivaldate|$bags" >> reservations.txt #Append flight information to the file
+	`zenity --info --width=300 --title="Legit Reservation Program" --text="Name: $name\nDeparture: $departure\nDestination: $destination\nDeparture Date: $departuredate\nArrival Date: $arrivaldate\nBags: $bags" 2> /dev/null`
 else    #If user's name is already in file
 	check=` zenity --list --title "Legit Reservation Program" --text="You've already scheduled a flight, would you like to reschedule with new information?" --column="Yes or no" "Yes" "No (keeps old info)" 2> /dev/null`
 	check=`echo "$check" | sed 's/\r//'`
@@ -92,10 +93,10 @@ else    #If user's name is already in file
 		touch reservationsCopy.txt
 #		echo "rescheduling..."
 		grep -v "^$name|" reservations.txt > reservationsCopy.txt #Add the existing travel information (minus the users old info) to a buffer file, then copy that information back to the main file
+		`zenity --info --width=300 --title="Legit Reservation Program" --text="Name: $name\nDeparture: $departure\nDestination: $destination\nDeparture Date: $departuredate\nArrival Date: $arrivaldate\nBags: $bags" 2> /dev/null`
 		cat reservationsCopy.txt > reservations.txt
 		echo "$name|$departure|$destination|$departuredate|$arrivaldate|$bags" >> reservations.txt #Append new info to the file
 	fi
 fi
 
-`zenity --info --width=300 --title="Legit Reservation Program" --text="Name: $name\nDeparture: $departure\nDestination: $destination\nDeparture Date: $departuredate\nArrival Date: $arrivaldate\nBags: $bags" 2> /dev/null`
 
